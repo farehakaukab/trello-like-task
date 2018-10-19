@@ -2,8 +2,11 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import InnerList from "./InnerList";
-import Modal from "../TaskModal";
-import TitleModal from "../EditTitle";
+import Modal from "../Modals/AddTaskModal";
+import TitleModal from "../Modals/EditTitleModal";
+import IconAddButton from "../Buttons/IconAddButtons";
+import IconDeleteButton from "../Buttons/IconDeleteButton";
+import IconEditButton from "../Buttons/IconEditButton";
 
 const BoardContainer = styled.div`
   margin: 8px;
@@ -12,40 +15,31 @@ const BoardContainer = styled.div`
   width: 300px;
   display: flex;
   flex-direction: column;
-  background-color: "white";
-`;
-const AddButton = styled.button`
-  background-color: lightgrey;
-  border: 1px solid black;
-  border-radius: 500px;
-  margin: 8px;
 `;
 
-const EditTitleButton = styled.button`
-  background-color: lightgrey;
-  border: 1px solid black;
-  border-radius: 1000px;
-  margin: 8px;
-`;
-
-const Title = styled.h3`
+const BoardHeader = styled.div`
+  display: flex;
+  margin-top: 10px;
   padding: 8px;
+  border-bottom: 3px solid grey;
+`;
+
+const Title = styled.h4`
+  padding: 20px;
+  padding-left: 5px;
+  margin-right: auto;
 `;
 
 const TasksList = styled.div`
   flex-grow: 1;
   padding: 8px;
-  background-color: ${props => (props.isDraggingOver ? "skyblue" : "white")};
+  background-color: ${props => (props.isDraggingOver ? "grey" : "white")};
   min-height: 100px;
 `;
 
 class Board extends Component {
   constructor(props) {
     super(props);
-    this.openAddTaskModal = this.openAddTaskModal.bind(this);
-    this.hideModal = this.hideModal.bind(this);
-    this.saveNewTask = this.saveNewTask.bind(this);
-    this.getUserInput = this.getUserInput.bind(this);
     this.state = {
       showModal: false,
       editTitle: false,
@@ -82,7 +76,11 @@ class Board extends Component {
     this.hideModal();
   };
 
+  deleteABoard = () => {
+    this.props.deleteBoard(this.props.board.id);
+  };
   render() {
+    console.log("control in board");
     return (
       <Draggable draggableId={this.props.board.id} index={this.props.index}>
         {provided => (
@@ -91,24 +89,23 @@ class Board extends Component {
             ref={provided.innerRef}
             showModal={this.state.showModal}
           >
-            <Title {...provided.dragHandleProps}>
+            <BoardHeader {...provided.dragHandleProps}>
+              <Title>{this.props.board.title}</Title>
               {this.state.editTitle ? (
                 <TitleModal
                   hideModal={this.hideModal}
                   saveNewTitle={this.saveNewTitle}
                   title={this.state.title}
                   getUserInput={this.getUserInput}
+                  openEditTitleModal={this.openEditTitleModal}
                 />
-              ) : (
-                this.state.title
-              )}
-              <EditTitleButton onClick={this.openEditTitleModal}>
-                Edit Title
-              </EditTitleButton>
-            </Title>
-            <AddButton onClick={this.openAddTaskModal}>Add New Task</AddButton>
+              ) : null}
+              <IconEditButton openEditTitleModal={this.openEditTitleModal} />
+              <IconDeleteButton deleteBoard={this.deleteABoard} />
+            </BoardHeader>
             {this.state.showModal ? (
               <Modal
+                openAddTaskModal={this.openAddTaskModal}
                 hideModal={this.hideModal}
                 saveNewTask={this.saveNewTask}
                 taskName={this.state.newTaskName}
@@ -124,13 +121,15 @@ class Board extends Component {
                 >
                   <InnerList
                     editTask={this.props.editTask}
+                    deleteTask={this.props.deleteTask}
+                    boardId={this.props.board.id}
                     tasks={this.props.tasks}
                   />
-
                   {provided.placeholder}
                 </TasksList>
               )}
             </Droppable>
+            <IconAddButton openAddTaskModal={this.openAddTaskModal} />
           </BoardContainer>
         )}
       </Draggable>

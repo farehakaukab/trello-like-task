@@ -1,30 +1,28 @@
 import styled from "styled-components";
 import React, { Component } from "react";
 import { Draggable } from "react-beautiful-dnd";
-import Modal from "../EditModal";
+import EditTaskModal from "../Modals/EditTaskModal";
+import IconEditButton from "../Buttons/IconEditButton";
+import IconDeleteButton from "../Buttons/IconDeleteButton";
 
 const TaskContainer = styled.div`
   margin-bottom: 8px;
   border: 1px solid lightgrey;
   padding: 8px;
   border-radius: 2px;
-  background-color: ${props => (props.isDragging ? "lightgreen" : "white")};
+  display: flex;
+  background-color: ${props => (props.isDragging ? "lightgrey" : "white")};
 `;
 
-const EditTaskButton = styled.button`
-  background-color: lightgrey;
-  border: 1px solid black;
-  border-radius: 1000px;
-  float: right;
+const TaskContent = styled.p`
+  padding: 20px;
+  padding-left: 0px;
+  margin-right: auto;
 `;
 
 class Task extends Component {
   constructor(props) {
     super(props);
-    this.openEditTaskModal = this.openEditTaskModal.bind(this);
-    this.hideModal = this.hideModal.bind(this);
-    this.saveEditedTask = this.saveEditedTask.bind(this);
-    this.getUserInput = this.getUserInput.bind(this);
     this.state = {
       showEditModal: false,
       editedTaskName: this.props.task.content
@@ -36,7 +34,9 @@ class Task extends Component {
   };
 
   getUserInput = event => {
-    this.setState({ editedTaskName: event.target.value });
+    return (event.target.value != ""
+      ? this.setState({ editedTaskName: event.target.value })
+      : null);
   };
 
   saveEditedTask = () => {
@@ -45,7 +45,11 @@ class Task extends Component {
   };
 
   hideModal = () => {
-    this.setState({ showEditModal: false, editedTaskName: "" });
+    this.setState({ showEditModal: false});
+  };
+
+  deleteATask = () => {
+    this.props.deleteTask(this.props.task.id, this.props.boardId);
   };
 
   render() {
@@ -58,17 +62,16 @@ class Task extends Component {
             ref={provided.innerRef}
             isDragging={snapshot.isDragging}
           >
-            {this.props.task.content}
-            <EditTaskButton onClick={this.openEditTaskModal}>
-              Edit
-            </EditTaskButton>
+            <TaskContent>{this.props.task.content}</TaskContent>
+            <IconEditButton openEditTaskModal={this.openEditTaskModal} />
+            <IconDeleteButton deleteTask={this.deleteATask} />
             {this.state.showEditModal ? (
-              <Modal
+              <EditTaskModal
+                openEditTaskModal={this.openEditTaskModal}
                 hideModal={this.hideModal}
                 saveEditedTask={this.saveEditedTask}
                 editedTaskName={this.state.editedTaskName}
                 getUserInput={this.getUserInput}
-                hideModal={this.hideModal}
               />
             ) : null}
           </TaskContainer>

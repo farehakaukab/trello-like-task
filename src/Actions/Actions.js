@@ -46,3 +46,18 @@ export function addNewBoard(boardName) {
     boardName
   };
 }
+
+export function deleteBoard(boardId) {
+  return {
+    type: "DELETE_BOARD",
+    boardId
+  };
+}
+
+export function deleteTask(taskId, boardId) {
+  return {
+    type: "DELETE_TASK",
+    taskId,
+    boardId
+  };
+}

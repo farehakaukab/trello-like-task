@@ -5,25 +5,22 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import Modal from "./BoardModal";
+import Modal from "./Modals/AddBoardModal";
+import Navbar from "../Components/Navbar";
+import Buttons from "../Components/AllButtons/";
 import {
   dragAndDropBoards,
   dragAndDropTasks,
   addNewTask,
   addNewBoard,
   editTask,
-  editTitle
+  editTitle,
+  deleteBoard,
+  deleteTask
 } from "../Actions/Actions";
 
 const WrapperContainer = styled.div`
   display: flex;
-`;
-
-const AddBoardButton = styled.button`
-  background-color: lightgrey;
-  border: 1px solid black;
-  border-radius: 1000px;
-  margin: 8px;
 `;
 
 class Container extends Component {
@@ -56,6 +53,7 @@ class Container extends Component {
     this.setState({ showModal: false, boardTitle: "" });
   };
 
+
   onDragEnd = results => {
     const { destination, source, draggableId, type } = results;
 
@@ -76,13 +74,14 @@ class Container extends Component {
   };
 
   render() {
+    console.log("control in container render")
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
-        <AddBoardButton onClick={this.openAddBoardModal}>
-          Add New Board
-        </AddBoardButton>
+        <Navbar />
+        <Buttons openAddBoardModal={this.openAddBoardModal}/>
         {this.state.showModal ? (
           <Modal
+            openAddBoardModal={this.openAddBoardModal}
             hideModal={this.hideModal}
             saveNewBoard={this.saveNewBoard}
             title={this.state.boardTitle}
@@ -114,6 +113,8 @@ class Container extends Component {
                     addNewTask={this.props.addNewTask}
                     editTask={this.props.editTask}
                     editTitle={this.props.editTitle}
+                    deleteBoard={this.props.deleteBoard}
+                    deleteTask={this.props.deleteTask}
                   />
                 );
               })}
@@ -140,7 +141,9 @@ Container = connect(
     addNewBoard,
     addNewTask,
     dragAndDropBoards,
-    dragAndDropTasks
+    dragAndDropTasks,
+    deleteBoard,
+    deleteTask
   }
 )(Container);
 

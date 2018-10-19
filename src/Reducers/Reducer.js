@@ -86,12 +86,21 @@ const Reducer = (state = initialStates, action) => {
     }
 
     case "ADD_NEW_TASK": {
+      let newTaskId='';
       const lastTaskId = Object.keys(state.tasks)[
         Object.keys(state.tasks).length - 1
       ];
-      const lastDigitOfTaskId = lastTaskId.substring(lastTaskId.length - 1);
-      const nextIdDigit = parseInt(lastDigitOfTaskId) + 1;
-      const newTaskId = lastTaskId.slice(0, -1) + nextIdDigit;
+      if(lastTaskId!=undefined){
+        
+        const lastDigitOfTaskId = lastTaskId.substring(lastTaskId.length - 1);
+        const nextIdDigit = parseInt(lastDigitOfTaskId) + 1;
+        newTaskId = lastTaskId.slice(0, -1) + nextIdDigit;
+      }
+
+      else{
+        newTaskId = "task-1";
+      }
+
       const boardToBeUpdated = state.Board[action.boardId];
       const taskIdsOfBoard = boardToBeUpdated.taskIds;
       const newTaskIds = taskIdsOfBoard.concat(newTaskId);
@@ -158,6 +167,45 @@ const Reducer = (state = initialStates, action) => {
           }
         }
       };
+    }
+
+    case "DELETE_BOARD": {
+      const allBoards= state.Board;
+      delete allBoards[action.boardId]; 
+      
+      const boardOrder= state.boardOrder;
+      const boardIndex= boardOrder.findIndex(boardid => boardid == action.boardId);
+      if(boardIndex!=-1) 
+        boardOrder.splice(boardIndex,1);
+
+      return {
+        ...state,
+        Board: allBoards,
+        boardOrder: boardOrder
+      };
+    }
+
+    case "DELETE_TASK": {
+      const allTasks= state.tasks;
+      delete allTasks[action.taskId];
+
+      const taskIdsOfCurrentBoard = state.Board[action.boardId].taskIds;
+      const taskIndex= taskIdsOfCurrentBoard.findIndex(taskid => taskid == action.taskId);
+      if(taskIndex!=-1) 
+      taskIdsOfCurrentBoard.splice(taskIndex,1);
+
+      return {
+        ...state,
+        tasks: allTasks,
+        Board: {
+          ...state.Board,
+          [action.boardId]:{
+            ...state.Board[action.boardId],
+            taskIds:taskIdsOfCurrentBoard
+          }
+        }
+
+      }
     }
 
     default: {

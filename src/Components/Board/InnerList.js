@@ -7,12 +7,15 @@ class InnerList extends Component {
   }
 
   render() {
+    console.log("control in tasks")
     return this.props.tasks.map((task, index) => (
       <Task
         key={task.id}
         task={task}
         index={index}
+        boardId={this.props.boardId}
         editTask={this.props.editTask}
+        deleteTask={this.props.deleteTask}
       />
     ));
   }

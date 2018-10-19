@@ -5,9 +5,10 @@ import "@atlaskit/css-reset";
 import { Provider } from "react-redux";
 import store from "./Store";
 
+
 ReactDOM.render(
   <Provider store={store}>
-    <Container />
+    <Container/>
   </Provider>,
   document.getElementById("root")
 );
