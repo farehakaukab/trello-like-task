@@ -34,9 +34,9 @@ class Task extends Component {
   };
 
   getUserInput = event => {
-    return (event.target.value != ""
+    return event.target.value != ""
       ? this.setState({ editedTaskName: event.target.value })
-      : null);
+      : null;
   };
 
   saveEditedTask = () => {
@@ -45,7 +45,7 @@ class Task extends Component {
   };
 
   hideModal = () => {
-    this.setState({ showEditModal: false});
+    this.setState({ showEditModal: false });
   };
 
   deleteATask = () => {

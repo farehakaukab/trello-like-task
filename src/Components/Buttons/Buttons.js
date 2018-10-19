@@ -1,19 +1,23 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
 
 const styles = theme => ({
   button: {
-    margin: theme.spacing.unit,
-  },
+    margin: theme.spacing.unit
+  }
 });
 
 function ContainedButtons(props) {
   const { classes } = props;
   return (
     <div>
-      <Button variant="contained" className={classes.button} onClick={props.openAddBoardModal}>
+      <Button
+        variant="contained"
+        className={classes.button}
+        onClick={props.openAddBoardModal}
+      >
         Add Board
       </Button>
     </div>
@@ -21,7 +25,7 @@ function ContainedButtons(props) {
 }
 
 ContainedButtons.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(ContainedButtons);

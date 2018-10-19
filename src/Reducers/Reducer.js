@@ -86,18 +86,15 @@ const Reducer = (state = initialStates, action) => {
     }
 
     case "ADD_NEW_TASK": {
-      let newTaskId='';
+      let newTaskId = "";
       const lastTaskId = Object.keys(state.tasks)[
         Object.keys(state.tasks).length - 1
       ];
-      if(lastTaskId!=undefined){
-        
+      if (lastTaskId != undefined) {
         const lastDigitOfTaskId = lastTaskId.substring(lastTaskId.length - 1);
         const nextIdDigit = parseInt(lastDigitOfTaskId) + 1;
         newTaskId = lastTaskId.slice(0, -1) + nextIdDigit;
-      }
-
-      else{
+      } else {
         newTaskId = "task-1";
       }
 
@@ -125,12 +122,20 @@ const Reducer = (state = initialStates, action) => {
     }
 
     case "ADD_NEW_BOARD": {
+      let newBoardId = "";
       const lastBoardId = Object.keys(state.Board)[
         Object.keys(state.Board).length - 1
       ];
-      const lastDigitOfBoardId = lastBoardId.substring(lastBoardId.length - 1);
-      const nextIdDigit = parseInt(lastDigitOfBoardId) + 1;
-      const newBoardId = lastBoardId.slice(0, -1) + nextIdDigit;
+      if (lastBoardId == undefined) {
+        newBoardId = "board-1";
+      } else {
+        const lastDigitOfBoardId = lastBoardId.substring(
+          lastBoardId.length - 1
+        );
+        const nextIdDigit = parseInt(lastDigitOfBoardId) + 1;
+        newBoardId = lastBoardId.slice(0, -1) + nextIdDigit;
+      }
+
       const newBoardsOrder = Array.from(state.boardOrder);
       newBoardsOrder.push(newBoardId);
       return {
@@ -170,42 +175,44 @@ const Reducer = (state = initialStates, action) => {
     }
 
     case "DELETE_BOARD": {
-      const allBoards= state.Board;
-      delete allBoards[action.boardId]; 
-      
-      const boardOrder= state.boardOrder;
-      const boardIndex= boardOrder.findIndex(boardid => boardid == action.boardId);
-      if(boardIndex!=-1) 
-        boardOrder.splice(boardIndex,1);
+      //const allBoards=state.Board;
+      const allBoards = Object.assign({}, state.Board);
+      delete allBoards[action.boardId];
+
+      const boardsOrder = state.boardOrder;
+      const boardIndex = boardsOrder.findIndex(
+        boardid => boardid == action.boardId
+      );
+      if (boardIndex != -1) boardsOrder.splice(boardIndex, 1);
 
       return {
         ...state,
         Board: allBoards,
-        boardOrder: boardOrder
+        boardOrder: boardsOrder
       };
     }
 
     case "DELETE_TASK": {
-      const allTasks= state.tasks;
+      const allTasks = state.tasks;
       delete allTasks[action.taskId];
 
       const taskIdsOfCurrentBoard = state.Board[action.boardId].taskIds;
-      const taskIndex= taskIdsOfCurrentBoard.findIndex(taskid => taskid == action.taskId);
-      if(taskIndex!=-1) 
-      taskIdsOfCurrentBoard.splice(taskIndex,1);
+      const taskIndex = taskIdsOfCurrentBoard.findIndex(
+        taskid => taskid == action.taskId
+      );
+      if (taskIndex != -1) taskIdsOfCurrentBoard.splice(taskIndex, 1);
 
       return {
         ...state,
         tasks: allTasks,
         Board: {
           ...state.Board,
-          [action.boardId]:{
+          [action.boardId]: {
             ...state.Board[action.boardId],
-            taskIds:taskIdsOfCurrentBoard
+            taskIds: taskIdsOfCurrentBoard
           }
         }
-
-      }
+      };
     }
 
     default: {

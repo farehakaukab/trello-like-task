@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import Modal from "./Modals/AddBoardModal";
 import Navbar from "../Components/Navbar";
-import Buttons from "../Components/AllButtons/";
+import Buttons from "../Components/Buttons/Buttons";
 import {
   dragAndDropBoards,
   dragAndDropTasks,
@@ -53,7 +53,6 @@ class Container extends Component {
     this.setState({ showModal: false, boardTitle: "" });
   };
 
-
   onDragEnd = results => {
     const { destination, source, draggableId, type } = results;
 
@@ -74,11 +73,11 @@ class Container extends Component {
   };
 
   render() {
-    console.log("control in container render")
+    console.log("control in container render");
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
         <Navbar />
-        <Buttons openAddBoardModal={this.openAddBoardModal}/>
+        <Buttons openAddBoardModal={this.openAddBoardModal} />
         {this.state.showModal ? (
           <Modal
             openAddBoardModal={this.openAddBoardModal}
