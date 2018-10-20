@@ -25,18 +25,16 @@ class Task extends Component {
     super(props);
     this.state = {
       showEditModal: false,
-      editedTaskName: this.props.task.content
+      editedTaskName: ''
     };
   }
 
   openEditTaskModal = () => {
-    this.setState({ showEditModal: true });
+    this.setState({ showEditModal: true, editedTaskName: this.props.task.content });
   };
 
   getUserInput = event => {
-    return event.target.value != ""
-      ? this.setState({ editedTaskName: event.target.value })
-      : null;
+    this.setState({ editedTaskName: event.target.value });
   };
 
   saveEditedTask = () => {
@@ -72,6 +70,7 @@ class Task extends Component {
                 saveEditedTask={this.saveEditedTask}
                 editedTaskName={this.state.editedTaskName}
                 getUserInput={this.getUserInput}
+                initialValue= {this.props.task.content}
               />
             ) : null}
           </TaskContainer>

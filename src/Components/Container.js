@@ -26,13 +26,9 @@ const WrapperContainer = styled.div`
 class Container extends Component {
   constructor(props) {
     super(props);
-    this.openAddBoardModal = this.openAddBoardModal.bind(this);
-    this.hideModal = this.hideModal.bind(this);
-    this.saveNewBoard = this.saveNewBoard.bind(this);
-    this.getUserInput = this.getUserInput.bind(this);
     this.state = {
       showModal: false,
-      boardTitle: ""
+      boardTitle: ' '
     };
   }
 
@@ -46,7 +42,7 @@ class Container extends Component {
   };
 
   openAddBoardModal = () => {
-    this.setState({ showModal: true });
+    this.setState({ showModal: true, boardTitle: ' ' });
   };
 
   hideModal = () => {

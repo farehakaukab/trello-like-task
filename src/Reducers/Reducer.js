@@ -1,79 +1,74 @@
-const initialStates = {
-  tasks: {
-    "task-1": { id: "task-1", content: "Wake up at 7 am" },
-    "task-2": { id: "task-2", content: "Work out" },
-    "task-3": { id: "task-3", content: "Drink lemon water" }
-  },
-  Board: {
-    "board-1": {
-      id: "board-1",
-      title: "Morning Routine",
-      taskIds: ["task-1", "task-2", "task-3"]
-    },
-    "board-2": {
-      id: "board-2",
-      title: "Evening Routine",
-      taskIds: []
-    },
-    "board-3": {
-      id: "board-3",
-      title: "Night Routine",
-      taskIds: []
-    }
-  },
-  boardOrder: ["board-1", "board-2", "board-3"]
-};
+import initialStates from "../Data/initialData";
+import {
+  lens,
+  compose,
+  insert,
+  remove,
+  set,
+  prop,
+  assoc,
+  replace,
+  propOr,
+  append,
+  dissoc,
+  reject
+} from "ramda";
 
 const Reducer = (state = initialStates, action) => {
   switch (action.type) {
     case "DRAG_AND_DROP_BOARDS": {
-      const newBoardOrder = Array.from(state.boardOrder);
-      newBoardOrder.splice(action.source.index, 1);
-      newBoardOrder.splice(action.destination.index, 0, action.draggableId);
-
+      const newBoardOrder = compose(
+        insert(action.destination.index, action.draggableId),
+        remove(action.source.index, 1)
+      )(state.boardOrder);
       return { ...state, boardOrder: newBoardOrder };
     }
 
     case "DRAG_AND_DROP_TASKS": {
-      const startBoard = state.Board[action.source.droppableId];
+      let startBoard = state.Board[action.source.droppableId];
       const endBoard = state.Board[action.destination.droppableId];
 
       //Task being dragged in the same board
       if (startBoard === endBoard) {
-        const startBoardTaskIds = Array.from(startBoard.taskIds);
-        startBoardTaskIds.splice(action.source.index, 1);
-        startBoardTaskIds.splice(
-          action.destination.index,
-          0,
-          action.draggableId
-        );
+        const newOrderOfTaskIdsOrder = compose(
+          insert(action.destination.index, action.draggableId),
+          remove(action.source.index, 1)
+        )(startBoard.taskIds);
 
-        const newStartBoard = {
-          ...startBoard,
-          taskIds: startBoardTaskIds
-        };
+        startBoard = set(
+          lens(prop("taskIds"), assoc("taskIds")),
+          newOrderOfTaskIdsOrder,
+          startBoard
+        );
 
         return {
           ...state,
-          Board: { ...state.Board, [newStartBoard.id]: newStartBoard }
+          Board: { ...state.Board, [startBoard.id]: startBoard }
         };
       }
 
       //Task being dragged from one board to another
-      const startBoardTaskIds = Array.from(startBoard.taskIds);
-      const endBoardTaskIds = Array.from(endBoard.taskIds);
-      startBoardTaskIds.splice(action.source.index, 1);
-      endBoardTaskIds.splice(action.destination.index, 0, action.draggableId);
+      const newStartBoardTaskIds = remove(
+        action.source.index,
+        1,
+        startBoard.taskIds
+      );
+      const newEndBoardTaskIds = insert(
+        action.destination.index,
+        action.draggableId,
+        endBoard.taskIds
+      );
 
-      const newStartBoard = {
-        ...startBoard,
-        taskIds: startBoardTaskIds
-      };
-
-      const newEndBoard = {
-        ...endBoard,
-        taskIds: endBoardTaskIds
-      };
+      const newStartBoard = set(
+        lens(prop("taskIds"), assoc("taskIds")),
+        newStartBoardTaskIds,
+        startBoard
+      );
+      const newEndBoard = set(
+        lens(prop("taskIds"), assoc("taskIds")),
+        newEndBoardTaskIds,
+        endBoard
+      );
 
       return {
         ...state,
@@ -86,29 +81,31 @@ const Reducer = (state = initialStates, action) => {
     }
 
     case "ADD_NEW_TASK": {
-      let newTaskId = "";
-      const lastTaskId = Object.keys(state.tasks)[
+      let lastTaskId = Object.keys(state.tasks)[
         Object.keys(state.tasks).length - 1
       ];
-      if (lastTaskId != undefined) {
-        const lastDigitOfTaskId = lastTaskId.substring(lastTaskId.length - 1);
+
+      lastTaskId = propOr("task-1", lastTaskId)(state.tasks);
+
+      if (lastTaskId != "task-1") {
+        const lastDigitOfTaskId = lastTaskId.id.substring(
+          lastTaskId.id.length - 1
+        );
         const nextIdDigit = parseInt(lastDigitOfTaskId) + 1;
-        newTaskId = lastTaskId.slice(0, -1) + nextIdDigit;
-      } else {
-        newTaskId = "task-1";
+        lastTaskId = replace(lastDigitOfTaskId, nextIdDigit, lastTaskId.id);
       }
 
       const boardToBeUpdated = state.Board[action.boardId];
-      const taskIdsOfBoard = boardToBeUpdated.taskIds;
-      const newTaskIds = taskIdsOfBoard.concat(newTaskId);
-      const updatedBoard = {
-        ...boardToBeUpdated,
-        taskIds: newTaskIds
-      };
-      const allTasks = state.tasks;
+      const newTaskIds = boardToBeUpdated.taskIds.concat(lastTaskId);
+      const updatedBoard = set(
+        lens(prop("taskIds"), assoc("taskIds")),
+        newTaskIds,
+        boardToBeUpdated
+      );
+
       const updatedTasks = {
-        ...allTasks,
-        [newTaskId]: { id: newTaskId, content: action.taskName }
+        ...state.tasks,
+        [lastTaskId]: { id: lastTaskId, content: action.taskName }
       };
 
       return {
@@ -122,27 +119,30 @@ const Reducer = (state = initialStates, action) => {
     }
 
     case "ADD_NEW_BOARD": {
-      let newBoardId = "";
-      const lastBoardId = Object.keys(state.Board)[
+      let lastBoardId = Object.keys(state.Board)[
         Object.keys(state.Board).length - 1
       ];
-      if (lastBoardId == undefined) {
-        newBoardId = "board-1";
-      } else {
-        const lastDigitOfBoardId = lastBoardId.substring(
-          lastBoardId.length - 1
+      lastBoardId = propOr("board-1", lastBoardId)(state.Board);
+
+      if (lastBoardId != "board-1") {
+        const lastDigitOfBoardId = lastBoardId.id.substring(
+          lastBoardId.id.length - 1
         );
         const nextIdDigit = parseInt(lastDigitOfBoardId) + 1;
-        newBoardId = lastBoardId.slice(0, -1) + nextIdDigit;
+        lastBoardId = replace(lastDigitOfBoardId, nextIdDigit, lastBoardId.id);
       }
 
-      const newBoardsOrder = Array.from(state.boardOrder);
-      newBoardsOrder.push(newBoardId);
+      const newBoardsOrder = append(lastBoardId, state.boardOrder);
+
       return {
         ...state,
         Board: {
           ...state.Board,
-          [newBoardId]: { id: newBoardId, title: action.boardName, taskIds: [] }
+          [lastBoardId]: {
+            id: lastBoardId,
+            title: action.boardName,
+            taskIds: []
+          }
         },
         boardOrder: newBoardsOrder
       };
@@ -175,33 +175,25 @@ const Reducer = (state = initialStates, action) => {
     }
 
     case "DELETE_BOARD": {
-      //const allBoards=state.Board;
-      const allBoards = Object.assign({}, state.Board);
-      delete allBoards[action.boardId];
-
-      const boardsOrder = state.boardOrder;
-      const boardIndex = boardsOrder.findIndex(
-        boardid => boardid == action.boardId
+      const allBoards = dissoc(action.boardId, state.Board);
+      const newboardsOrder = reject(
+        board => board === action.boardId,
+        state.boardOrder
       );
-      if (boardIndex != -1) boardsOrder.splice(boardIndex, 1);
 
       return {
         ...state,
         Board: allBoards,
-        boardOrder: boardsOrder
+        boardOrder: newboardsOrder
       };
     }
 
     case "DELETE_TASK": {
-      const allTasks = state.tasks;
-      delete allTasks[action.taskId];
-
-      const taskIdsOfCurrentBoard = state.Board[action.boardId].taskIds;
-      const taskIndex = taskIdsOfCurrentBoard.findIndex(
-        taskid => taskid == action.taskId
+      const allTasks = dissoc(action.taskId, state.tasks);
+      const newtaskIdsOfCurrentBoard = reject(
+        task => task === action.taskId,
+        state.Board[action.boardId].taskIds
       );
-      if (taskIndex != -1) taskIdsOfCurrentBoard.splice(taskIndex, 1);
-
       return {
         ...state,
         tasks: allTasks,
@@ -209,7 +201,7 @@ const Reducer = (state = initialStates, action) => {
           ...state.Board,
           [action.boardId]: {
             ...state.Board[action.boardId],
-            taskIds: taskIdsOfCurrentBoard
+            taskIds: newtaskIdsOfCurrentBoard
           }
         }
       };

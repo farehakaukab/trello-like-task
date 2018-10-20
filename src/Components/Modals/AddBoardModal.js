@@ -33,10 +33,12 @@ class AlertDialog extends React.Component {
               <form className={classes.container} noValidate autoComplete="off">
                 <TextField
                   id="board-title"
-                  label="Title"
-                  value={this.props.boardTitle}
+                  label="Name"
+                  value={this.props.title}
                   onChange={this.props.getUserInput}
                   margin="normal"
+                  helperText="Please enter a title"
+                  error={this.props.title.length === 0 ? true : false}
                 />
               </form>
             </DialogContentText>
@@ -45,7 +47,12 @@ class AlertDialog extends React.Component {
             <Button onClick={this.props.hideModal} color="secondary">
               Cancel
             </Button>
-            <Button onClick={this.props.saveNewBoard} color="primary" autoFocus>
+            <Button
+              disabled={this.props.title.length === 0 ? true : false}
+              onClick={this.props.saveNewBoard}
+              color="primary"
+              autoFocus
+            >
               Save
             </Button>
           </DialogActions>

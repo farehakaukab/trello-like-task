@@ -31,10 +31,12 @@ class AlertDialog extends React.Component {
               <form className={classes.container} noValidate autoComplete="off">
                 <TextField
                   id="task-name"
-                  label="Task Name"
+                  label="Name"
                   value={this.props.editedTaskName}
                   onChange={this.props.getUserInput}
                   margin="normal"
+                  helperText="Please enter a name of the task"
+                  error={this.props.editedTaskName.length === 0 ? true : false}
                 />
               </form>
             </DialogContentText>
@@ -44,6 +46,7 @@ class AlertDialog extends React.Component {
               Cancel
             </Button>
             <Button
+              disabled={this.props.editedTaskName.length === 0 ? true : false}
               onClick={this.props.saveEditedTask}
               color="primary"
               autoFocus

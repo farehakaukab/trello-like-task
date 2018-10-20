@@ -43,17 +43,17 @@ class Board extends Component {
     this.state = {
       showModal: false,
       editTitle: false,
-      title: this.props.board.title,
-      newTaskName: ""
+      title: '',
+      newTaskName: ' '
     };
   }
 
   openAddTaskModal = () => {
-    this.setState({ showModal: true });
+    this.setState({ showModal: true, newTaskName : ' ' });
   };
 
   openEditTitleModal = () => {
-    this.setState({ editTitle: true });
+    this.setState({ editTitle: true, title: this.props.board.title });
   };
 
   getUserInput = event => {
