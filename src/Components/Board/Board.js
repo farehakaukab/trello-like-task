@@ -2,11 +2,8 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import InnerList from "./InnerList";
-import Modal from "../Modals/AddTaskModal";
-import TitleModal from "../Modals/EditTitleModal";
-import IconAddButton from "../Buttons/IconAddButtons";
-import IconDeleteButton from "../Buttons/IconDeleteButton";
-import IconEditButton from "../Buttons/IconEditButton";
+import Modal from "../Modals/Modal";
+import IconButton from "../Buttons/IconButtons";
 
 const BoardContainer = styled.div`
   margin: 8px;
@@ -41,29 +38,29 @@ class Board extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showModal: false,
-      editTitle: false,
+      showEditTitleModal: false,
+      showEditTitleModal: false,
       title: '',
       newTaskName: ' '
     };
   }
 
   openAddTaskModal = () => {
-    this.setState({ showModal: true, newTaskName : ' ' });
+    this.setState({ showAddTaskModal: true, newTaskName : ' ' });
   };
 
   openEditTitleModal = () => {
-    this.setState({ editTitle: true, title: this.props.board.title });
+    this.setState({ showEditTitleModal: true, title: this.props.board.title });
   };
 
   getUserInput = event => {
-    !this.state.editTitle
+    !this.state.showEditTitleModal
       ? this.setState({ newTaskName: event.target.value })
       : this.setState({ title: event.target.value });
   };
 
   hideModal = () => {
-    this.setState({ showModal: false, newTaskName: "", editTitle: false });
+    this.setState({ showAddTaskModal: false, newTaskName: "", showEditTitleModal: false });
   };
 
   saveNewTask = () => {
@@ -80,36 +77,40 @@ class Board extends Component {
     this.props.deleteBoard(this.props.board.id);
   };
   render() {
-    console.log("control in board");
+    //console.log("control in board");
     return (
       <Draggable draggableId={this.props.board.id} index={this.props.index}>
         {provided => (
           <BoardContainer
             {...provided.draggableProps}
             ref={provided.innerRef}
-            showModal={this.state.showModal}
+            showAddTaskModal={this.state.showAddTaskModal}
           >
             <BoardHeader {...provided.dragHandleProps}>
               <Title>{this.props.board.title}</Title>
-              {this.state.editTitle ? (
-                <TitleModal
-                  hideModal={this.hideModal}
-                  saveNewTitle={this.saveNewTitle}
-                  title={this.state.title}
-                  getUserInput={this.getUserInput}
-                  openEditTitleModal={this.openEditTitleModal}
+              {this.state.showEditTitleModal ? (
+                <Modal
+                  modalTitle="Edit Board Title"
+                  textfieldId="task-title"
+                  hideModalHandler={this.hideModal}
+                  saveButtonHandler={this.saveNewTitle}
+                  textfieldValue={this.state.title}
+                  onChangeHandler={this.getUserInput}
+                  openModalHandler={this.openEditTitleModal}
                 />
               ) : null}
-              <IconEditButton openEditTitleModal={this.openEditTitleModal} />
-              <IconDeleteButton deleteBoard={this.deleteABoard} />
+              <IconButton handleClick={this.openEditTitleModal} label="Edit"/>
+              <IconButton handleClick={this.deleteABoard} label="Delete"/>
             </BoardHeader>
-            {this.state.showModal ? (
+            {this.state.showEditTitleModal ? (
               <Modal
-                openAddTaskModal={this.openAddTaskModal}
-                hideModal={this.hideModal}
-                saveNewTask={this.saveNewTask}
-                taskName={this.state.newTaskName}
-                getUserInput={this.getUserInput}
+                modalTitle="Add New Task"
+                textfieldId="task-title"
+                openModalHandler={this.openAddTaskModal}
+                hideModalHandler={this.hideModal}
+                saveButtonHandler={this.saveNewTask}
+                textfieldValue={this.state.newTaskName}
+                onChangeHandler={this.getUserInput}
               />
             ) : null}
             <Droppable droppableId={this.props.board.id} type="tasks">
@@ -129,7 +130,7 @@ class Board extends Component {
                 </TasksList>
               )}
             </Droppable>
-            <IconAddButton openAddTaskModal={this.openAddTaskModal} />
+            <IconButton handleClick={this.openAddTaskModal} label="Add" />
           </BoardContainer>
         )}
       </Draggable>

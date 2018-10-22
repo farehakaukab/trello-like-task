@@ -1,9 +1,8 @@
 import styled from "styled-components";
 import React, { Component } from "react";
 import { Draggable } from "react-beautiful-dnd";
-import EditTaskModal from "../Modals/EditTaskModal";
-import IconEditButton from "../Buttons/IconEditButton";
-import IconDeleteButton from "../Buttons/IconDeleteButton";
+import Modal from "../Modals/Modal";
+import IconButton from "../Buttons/IconButtons";
 
 const TaskContainer = styled.div`
   margin-bottom: 8px;
@@ -61,16 +60,17 @@ class Task extends Component {
             isDragging={snapshot.isDragging}
           >
             <TaskContent>{this.props.task.content}</TaskContent>
-            <IconEditButton openEditTaskModal={this.openEditTaskModal} />
-            <IconDeleteButton deleteTask={this.deleteATask} />
+            <IconButton handleClick={this.openEditTaskModal} label="Edit"/>
+            <IconButton handleClick={this.deleteATask} label="Delete"/>
             {this.state.showEditModal ? (
-              <EditTaskModal
-                openEditTaskModal={this.openEditTaskModal}
-                hideModal={this.hideModal}
-                saveEditedTask={this.saveEditedTask}
-                editedTaskName={this.state.editedTaskName}
-                getUserInput={this.getUserInput}
-                initialValue= {this.props.task.content}
+              <Modal
+                modalTitle="Edit Task"
+                textfieldId={"task-title"}
+                openModalHandler={this.openEditTaskModal}
+                hideModalHandler={this.hideModal}
+                saveButtonHandler={this.saveEditedTask}
+                textfieldValue={this.state.editedTaskName}
+                onChangeHandler={this.getUserInput}
               />
             ) : null}
           </TaskContainer>

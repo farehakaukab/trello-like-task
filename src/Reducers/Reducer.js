@@ -87,7 +87,7 @@ const Reducer = (state = initialStates, action) => {
 
       lastTaskId = propOr("task-1", lastTaskId)(state.tasks);
 
-      if (lastTaskId != "task-1") {
+      if (lastTaskId !== "task-1") {
         const lastDigitOfTaskId = lastTaskId.id.substring(
           lastTaskId.id.length - 1
         );
@@ -124,7 +124,7 @@ const Reducer = (state = initialStates, action) => {
       ];
       lastBoardId = propOr("board-1", lastBoardId)(state.Board);
 
-      if (lastBoardId != "board-1") {
+      if (lastBoardId !== "board-1") {
         const lastDigitOfBoardId = lastBoardId.id.substring(
           lastBoardId.id.length - 1
         );

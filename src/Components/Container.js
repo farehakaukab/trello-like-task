@@ -1,11 +1,9 @@
 import React, { Component } from "react";
-import initialData from "../Data/initialData";
 import Board from "../Components/Board/Board";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import Modal from "./Modals/AddBoardModal";
+import Modal from "./Modals/Modal";
 import Navbar from "../Components/Navbar";
 import Buttons from "../Components/Buttons/Buttons";
 import {
@@ -28,7 +26,7 @@ class Container extends Component {
     super(props);
     this.state = {
       showModal: false,
-      boardTitle: ' '
+      boardTitle: " "
     };
   }
 
@@ -42,7 +40,7 @@ class Container extends Component {
   };
 
   openAddBoardModal = () => {
-    this.setState({ showModal: true, boardTitle: ' ' });
+    this.setState({ showModal: true, boardTitle: " " });
   };
 
   hideModal = () => {
@@ -60,7 +58,7 @@ class Container extends Component {
     )
       return;
 
-    if (type == "column") {
+    if (type === "column") {
       this.props.dragAndDropBoards(destination, source, draggableId);
       return;
     }
@@ -76,12 +74,13 @@ class Container extends Component {
         <Buttons openAddBoardModal={this.openAddBoardModal} />
         {this.state.showModal ? (
           <Modal
-            openAddBoardModal={this.openAddBoardModal}
-            hideModal={this.hideModal}
-            saveNewBoard={this.saveNewBoard}
-            title={this.state.boardTitle}
-            getUserInput={this.getUserInput}
-            openAddBoardModal={this.openAddBoardModal}
+            modalTitle="Add New Board"
+            textfieldId="board-title"
+            openModalHandler={this.openAddBoardModal}
+            hideModalHandler={this.hideModal}
+            saveButtonHandler={this.saveNewBoard}
+            textfieldValue={this.state.boardTitle}
+            onChangeHandler={this.getUserInput}
           />
         ) : null}
         <Droppable
